@@ -1,5 +1,7 @@
 package com.calabrianshop.progettopsw.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Objects;
@@ -116,7 +118,7 @@ public class Prodotto {
     }
 
     private Collection<ProdottoInCarrello> prodottoInCarrello;
-
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "prodotto")
     public Collection<ProdottoInCarrello> getProdottoInCarrello() {
         return prodottoInCarrello;
@@ -127,7 +129,7 @@ public class Prodotto {
     }
 
     private Collection<OrdineProdotto> ordineProdottoCol;
-
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "prodotto")
     public Collection<OrdineProdotto> getOrdineProdottoCol() {
         return ordineProdottoCol;

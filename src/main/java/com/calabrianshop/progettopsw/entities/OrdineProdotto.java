@@ -30,7 +30,7 @@ public class OrdineProdotto {
     }
 
     private Prodotto prodotto;
-    @JsonIgnore
+
     @ManyToOne(cascade = CascadeType.ALL, optional = false)
     public Prodotto getProdotto() {
         return prodotto;
