@@ -26,7 +26,6 @@ public class ProdottoService {
 
     @Transactional(readOnly = true)
     public List<Prodotto> showAllProducts(){
-
         return prodottoRepository.findAll();
     }
 
@@ -38,11 +37,22 @@ public class ProdottoService {
     }
 
 
+
     @Transactional(readOnly = false)
     public void addProduct(Prodotto prodotto){
         if(prodottoRepository.existsById(prodotto.getId()))
             throw new IllegalArgumentException(("Prodotto già esistente!"));
         prodottoRepository.save(prodotto);
+    }
+
+    @Transactional(readOnly = false)
+    public void updateQuantita(int id){
+        if(!prodottoRepository.existsById(id))
+            throw  new IllegalArgumentException("prodotto inesistente!");
+        Prodotto old=em.find(Prodotto.class, id);
+        Integer quantita= old.getQuantita();
+        old.setQuantita(quantita+1);
+        em.flush();
     }
 
     @Transactional(readOnly = false)

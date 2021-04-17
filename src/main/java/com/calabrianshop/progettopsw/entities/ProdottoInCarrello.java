@@ -1,5 +1,7 @@
 package com.calabrianshop.progettopsw.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -39,7 +41,7 @@ public class ProdottoInCarrello {
     }
 
     private Utente utente;
-
+    @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL, optional = false)
     public Utente getUtente() {
         return utente;
@@ -50,7 +52,7 @@ public class ProdottoInCarrello {
     }
 
     private Prodotto prodotto;
-
+    @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL, optional = false)
     public Prodotto getProdotto() {
         return prodotto;

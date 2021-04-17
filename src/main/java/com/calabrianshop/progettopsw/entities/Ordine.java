@@ -1,5 +1,6 @@
 package com.calabrianshop.progettopsw.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ public class Ordine {
     private Date data;
     private int id;
     private double totale;
+    private String indirizzo;
 
     @Basic
     @CreationTimestamp
@@ -38,6 +40,16 @@ public class Ordine {
     }
 
     @Basic
+    @Column(name = "indirizzo")
+    public String getIndirizzo() {
+        return indirizzo;
+    }
+
+    public void setIndirizzo(String indirizzo) {
+        this.indirizzo = indirizzo;
+    }
+
+    @Basic
     @Column(name = "totale")
     public double getTotale() {
         return totale;
@@ -54,17 +66,17 @@ public class Ordine {
         Ordine ordine = (Ordine) o;
         return id == ordine.id &&
                 Double.compare(ordine.totale, totale) == 0 &&
-                Objects.equals(data, ordine.data);
+                Objects.equals(data, ordine.data)&& Objects.equals(indirizzo, ordine.indirizzo);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(data, id, totale);
+        return Objects.hash(data, id, totale,indirizzo);
     }
 
     private Utente utente;
-
+    @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL, optional = false)
     public Utente getUtente() {
         return utente;

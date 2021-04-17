@@ -12,6 +12,8 @@ public class Prodotto {
     private int quantita;
     private double prezzo;
     private String venditore;
+    private String imagePath;
+    private String descrizione;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -73,6 +75,26 @@ public class Prodotto {
     public void setVenditore(String venditore) {
         this.venditore = venditore;
     }
+
+    @Basic
+    @Column(name = "imagepath")
+    public String getImagePath(){
+        return imagePath;
+    }
+    public void setImagePath(String s){
+        this.imagePath=s;
+    }
+
+    @Basic
+    @Column(name = "descrizione")
+    public String getDescrizione() {
+        return descrizione;
+    }
+
+    public void setDescrizione(String descrizione) {
+        this.descrizione = descrizione;
+    }
+
 
     @Override
     public boolean equals(Object o) {

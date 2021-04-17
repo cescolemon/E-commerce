@@ -1,5 +1,7 @@
 package com.calabrianshop.progettopsw.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -28,7 +30,7 @@ public class OrdineProdotto {
     }
 
     private Prodotto prodotto;
-
+    @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL, optional = false)
     public Prodotto getProdotto() {
         return prodotto;
@@ -39,7 +41,7 @@ public class OrdineProdotto {
     }
 
     private Ordine ordine;
-
+    @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL, optional = false)
     public Ordine getOrdine() {
         return ordine;

@@ -11,16 +11,6 @@ public class Utente {
     private String email;
     private String password;
 
-    @Basic
-    @Column(name = "nome")
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -31,6 +21,16 @@ public class Utente {
     public void setId(int id) {
         this.id = id;
     }
+    @Basic
+    @Column(name = "nome")
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
 
     @Basic
     @Column(name = "email")
@@ -90,4 +90,11 @@ public class Utente {
     public void setOrdini(Collection<Ordine> ordini) {
         this.ordini = ordini;
     }
-}
+
+
+private Collection<Bolla> bolle;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "utente")public Collection<Bolla> getBolle() {
+    return bolle;
+}public void setBolle(Collection<Bolla> bolle) {
+    this.bolle = bolle;
+}}
