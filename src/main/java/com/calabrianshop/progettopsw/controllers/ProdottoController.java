@@ -4,15 +4,13 @@ package com.calabrianshop.progettopsw.controllers;
 import com.calabrianshop.progettopsw.entities.Prodotto;
 import com.calabrianshop.progettopsw.services.ProdottoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = {"http://localhost:4200"})
 @RestController
 @RequestMapping("/products")
-@PreAuthorize("hasAuthority('Admin')")
-@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:4300"})
 
 
 public class ProdottoController {

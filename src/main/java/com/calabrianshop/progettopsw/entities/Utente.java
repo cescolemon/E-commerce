@@ -1,5 +1,7 @@
 package com.calabrianshop.progettopsw.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Objects;
@@ -71,7 +73,8 @@ public class Utente {
 
     private Collection<ProdottoInCarrello> carrello;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "utente")
+    @JsonIgnore
+    @OneToMany(mappedBy = "utente", cascade = CascadeType.ALL, orphanRemoval = true)
     public Collection<ProdottoInCarrello> getCarrello() {
         return carrello;
     }
@@ -82,7 +85,7 @@ public class Utente {
 
     private Collection<Ordine> ordini;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "utente")
+    @OneToMany(mappedBy = "utente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     public Collection<Ordine> getOrdini() {
         return ordini;
     }
@@ -93,7 +96,8 @@ public class Utente {
 
 
 private Collection<Bolla> bolle;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "utente")public Collection<Bolla> getBolle() {
+    @OneToMany(mappedBy = "utente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    public Collection<Bolla> getBolle() {
     return bolle;
 }public void setBolle(Collection<Bolla> bolle) {
     this.bolle = bolle;

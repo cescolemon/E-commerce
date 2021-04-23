@@ -4,22 +4,21 @@ import com.calabrianshop.progettopsw.entities.*;
 import com.calabrianshop.progettopsw.reporsitories.OrdineProdottoRepository;
 import com.calabrianshop.progettopsw.reporsitories.OrdineRepository;
 import com.calabrianshop.progettopsw.reporsitories.ProdottoInCarrelloRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import javax.servlet.http.HttpServletRequest;
-import java.security.Principal;
-import java.sql.Timestamp;
-import java.time.Instant;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 @Service
 public class CarrelloService {
@@ -36,8 +35,8 @@ public class CarrelloService {
     private OrdineProdottoRepository ordineProdottoRepository;
 
     @Transactional(readOnly = false)
-    public void emptyCart( HttpServletRequest user) {
-        Utente u = utenteService.getUtente(user);
+    public void emptyCart() {
+        Utente u = utenteService.getUtente();
         List<ProdottoInCarrello> car = (List<ProdottoInCarrello>) u.getCarrello();
         car.clear();
         entityManager.flush();
@@ -45,24 +44,39 @@ public class CarrelloService {
 
 
     @Transactional(readOnly = false)
-    public void rimuoviProdottoInCarrello( HttpServletRequest user, ProdottoInCarrello prodotto) {
-        Utente u = utenteService.getUtente(user);
+    public void rimuoviProdottoInCarrello( ProdottoInCarrello prodotto) {
+        Utente u = utenteService.getUtente();
         prodotto.setUtente(u);
         u.getCarrello().remove(prodotto);
         System.out.println("prodotto rimosso" + prodotto.getProdotto().getNome());
         entityManager.flush();
     }
 
+    private JsonNode getTokenNode() {
+        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jwtAsString;
+        JsonNode jsonNode;
+        try {
+            jwtAsString = objectMapper.writeValueAsString(jwt);
+            jsonNode = objectMapper.readTree(jwtAsString);
+        } catch (JsonProcessingException e) {
+            e.getMessage();
+            throw new RuntimeException("Unable to retrieve user's info!");
+        }
+        return jsonNode;
+    }
+
     @Transactional(readOnly = false)
-    public ProdottoInCarrello aggiungiProdotto( HttpServletRequest user, ProdottoInCarrello prodotto) {
-        System.out.println("user is " + user.getUserPrincipal().getName());
-        Utente u = utenteService.getUtente(user);
+    public ProdottoInCarrello aggiungiProdotto( ProdottoInCarrello prodotto) {
+        System.out.println("user is " + getTokenNode().get("claims").get("email").asText());
+        Utente u = utenteService.getUtente();
         System.out.println("utente is " + u.getId() + u.getNome() + u.getEmail() + u.getCarrello());
         prodotto.setUtente(u);
         System.out.println("Il prodotto da aggiungere è :" +prodotto.getProdotto().getNome());
        for (ProdottoInCarrello p : u.getCarrello()) {
             System.out.println("i prodotti nel carrello sono : " + p.getProdotto().getNome());
-            if (p.equals(prodotto)) {
+            if(p.equals(prodotto)) {
                 System.out.println("I prodotti sono uguali");
                 int newQuant = p.getQuantita() + prodotto.getQuantita();
                 //if(newQuant>p.getProdotto().getQuantita())throw new IllegalStateException("non disponibile!");
@@ -75,8 +89,8 @@ public class CarrelloService {
     }
 
     @Transactional
-    public List<ProdottoInCarrello> updateCarrello(HttpServletRequest user, List<ProdottoInCarrello> prodotti) {
-        Utente u = utenteService.getUtente(user);
+    public List<ProdottoInCarrello> updateCarrello( List<ProdottoInCarrello> prodotti) {
+        Utente u = utenteService.getUtente();
         u.getCarrello().clear();
         for (ProdottoInCarrello p : prodotti) {
             p.setUtente(u);
@@ -88,13 +102,14 @@ public class CarrelloService {
 
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public Ordine registraOrdine( HttpServletRequest user, String ind) {
-        Utente u = utenteService.getUtente(user);
+    public Ordine registraOrdine(String ind) {
+        Utente u = utenteService.getUtente();
         if (u.getCarrello().isEmpty()) throw new IllegalStateException();
         Ordine newOrdine = new Ordine();
         System.out.println(u.getEmail() + " " + u.getNome());
         newOrdine.setUtente(u);
-        newOrdine.setData(Timestamp.from(Instant.now()));
+        String timeStamp = new SimpleDateFormat("yyyy.MM.dd  HH:mm.ss").format(new Date());
+        newOrdine.setData(timeStamp);
         newOrdine.setId(0);
         newOrdine.setTotale(0.0);
         newOrdine.setIndirizzo(ind);

@@ -31,7 +31,7 @@ public class OrdineProdotto {
 
     private Prodotto prodotto;
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @ManyToOne
     public Prodotto getProdotto() {
         return prodotto;
     }
@@ -42,7 +42,7 @@ public class OrdineProdotto {
 
     private Ordine ordine;
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @ManyToOne
     public Ordine getOrdine() {
         return ordine;
     }
@@ -50,4 +50,10 @@ public class OrdineProdotto {
     public void setOrdine(Ordine ordine) {
         this.ordine = ordine;
     }
+
+    @Override
+    public String toString(){
+        return " Prdotto: "+getProdotto();
+    }
+
 }

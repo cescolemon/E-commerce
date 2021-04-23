@@ -2,17 +2,15 @@ package com.calabrianshop.progettopsw.services;
 
 import com.calabrianshop.progettopsw.entities.Bolla;
 import com.calabrianshop.progettopsw.entities.Ordine;
+import com.calabrianshop.progettopsw.entities.Utente;
 import com.calabrianshop.progettopsw.reporsitories.BollaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import javax.servlet.http.HttpServletRequest;
-import java.security.Principal;
+
+
 
 @Service
 public class BollaService {
@@ -23,13 +21,22 @@ public class BollaService {
     @Autowired
     EntityManager entityManager;
 
+    @Autowired
+    UtenteService utenteService;
+
     @Transactional(readOnly = false)
-    public Bolla generaBolla(HttpServletRequest user, Ordine ordine){
+    public Bolla generaBolla(Ordine ordine){
+        if(bollaRepository.existsByOrdine(ordine)) return bollaRepository.findByOrdine(ordine);
         Bolla b= new Bolla();
-        int id=ordine.getId();
-        b.setId(id);
+        Utente u= utenteService.getUtente();
+        b.setId(0);
         b.setOrdine(ordine);
+        b.setUtente(u);
+        bollaRepository.save(b);
         return b;
     }
+
+
+
 
 }

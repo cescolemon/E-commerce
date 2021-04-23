@@ -3,7 +3,6 @@ package com.calabrianshop.progettopsw.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import java.util.Collection;
 import java.util.Objects;
 
 @Entity
@@ -39,7 +38,7 @@ public class Bolla {
 
     private Ordine ordine;
 
-    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    @OneToOne
     public Ordine getOrdine() {
         return ordine;
     }
@@ -52,7 +51,7 @@ public class Bolla {
 private Utente utente;
 
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @ManyToOne
     public Utente getUtente() {
         return utente;
     }

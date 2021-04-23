@@ -1,12 +1,7 @@
 package com.calabrianshop.progettopsw.support.authentication;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.experimental.UtilityClass;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
 
 
 @UtilityClass
@@ -14,7 +9,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 public class Utils {
 
 
-    public Jwt getPrincipal() {
+  /*  public Jwt getPrincipal() {
         return (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
@@ -30,7 +25,7 @@ public class Utils {
         return getTokenNode().get("claims").get("preferred_username").asText();
     }
 
-    private JsonNode getTokenNode() {
+   /* private JsonNode getTokenNode() {
         Jwt jwt = getPrincipal();
         ObjectMapper objectMapper = new ObjectMapper();
         String jwtAsString;
@@ -44,6 +39,6 @@ public class Utils {
         }
         return jsonNode;
     }
-
+*/
 
 }

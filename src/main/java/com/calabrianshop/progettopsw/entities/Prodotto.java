@@ -119,7 +119,7 @@ public class Prodotto {
 
     private Collection<ProdottoInCarrello> prodottoInCarrello;
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prodotto")
+    @OneToMany( mappedBy = "prodotto")
     public Collection<ProdottoInCarrello> getProdottoInCarrello() {
         return prodottoInCarrello;
     }
@@ -130,7 +130,7 @@ public class Prodotto {
 
     private Collection<OrdineProdotto> ordineProdottoCol;
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prodotto")
+    @OneToMany(mappedBy = "prodotto")
     public Collection<OrdineProdotto> getOrdineProdottoCol() {
         return ordineProdottoCol;
     }

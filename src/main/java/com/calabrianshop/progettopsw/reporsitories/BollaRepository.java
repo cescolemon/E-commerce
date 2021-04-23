@@ -15,5 +15,6 @@ public interface BollaRepository extends JpaRepository<Bolla,Integer> {
     Bolla findByOrdine(Ordine ordine);
     List<Bolla> findByUtente(Utente utente);
     boolean existsById(int id);
+    boolean existsByOrdine(Ordine ordine);
 
 }

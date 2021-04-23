@@ -1,30 +1,25 @@
 package com.calabrianshop.progettopsw.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-
-import java.util.Date;
 import java.util.Collection;
 import java.util.Objects;
 
 @Entity
 public class Ordine {
-    private Date data;
+    private String data;
     private int id;
     private double totale;
     private String indirizzo;
 
     @Basic
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "data")
-    public Date getData() {
+    public String getData() {
         return data;
     }
 
-    public void setData(Date data) {
+    public void setData(String data) {
         this.data = data;
     }
 
@@ -77,7 +72,7 @@ public class Ordine {
 
     private Utente utente;
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @ManyToOne( optional = false)
     public Utente getUtente() {
         return utente;
     }
@@ -88,7 +83,7 @@ public class Ordine {
 
     private Collection<OrdineProdotto> ordineProdottoCol;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "ordine")
+    @OneToMany(mappedBy = "ordine")
     public Collection<OrdineProdotto> getOrdineProdottoCol() {
         return ordineProdottoCol;
     }
@@ -99,7 +94,7 @@ public class Ordine {
 
     private Bolla bolla;
 
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "ordine", optional = false)
+    @OneToOne
     public Bolla getBolla() {
         return bolla;
     }

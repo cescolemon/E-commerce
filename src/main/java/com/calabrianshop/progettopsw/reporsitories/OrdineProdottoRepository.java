@@ -11,4 +11,5 @@ import java.util.List;
 public interface OrdineProdottoRepository extends JpaRepository<OrdineProdotto,Integer> {
 
     List<OrdineProdotto> findByOrdine(Ordine ordine);
+    List<OrdineProdotto> findAll();
 }

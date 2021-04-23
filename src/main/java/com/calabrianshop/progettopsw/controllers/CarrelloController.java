@@ -1,6 +1,5 @@
 package com.calabrianshop.progettopsw.controllers;
 
-import com.calabrianshop.progettopsw.entities.Bolla;
 import com.calabrianshop.progettopsw.entities.Ordine;
 import com.calabrianshop.progettopsw.entities.ProdottoInCarrello;
 import com.calabrianshop.progettopsw.entities.Utente;
@@ -8,23 +7,18 @@ import com.calabrianshop.progettopsw.services.BollaService;
 import com.calabrianshop.progettopsw.services.CarrelloService;
 import com.calabrianshop.progettopsw.services.UtenteService;
 import com.calabrianshop.progettopsw.support.Carrello;
-import org.ietf.jgss.Oid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import java.security.Principal;
-import java.util.List;
 
+
+
+@CrossOrigin(origins = {"http://localhost:4200"})
 @RestController
 @RequestMapping("/cart")
-@CrossOrigin("http://localhost:4300")
 public class CarrelloController {
 
     @Autowired
@@ -35,51 +29,53 @@ public class CarrelloController {
     private BollaService bollaService;
 
 
-    @GetMapping("/orderreg")
-    public ResponseEntity regOridne(@AuthenticationPrincipal HttpServletRequest user, @RequestParam("indirizzo") String indirizzo) {
-
-        Ordine o = carrelloService.registraOrdine(user,indirizzo);
+    @PostMapping(value = "/orderreg",consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity regOridne( @RequestBody String indirizzo) {
+        System.out.println(indirizzo);
+        Ordine o = carrelloService.registraOrdine(indirizzo);
         return new ResponseEntity(o, HttpStatus.OK);
     }
 
+    @CrossOrigin("http://localhost:4300")
     @GetMapping
-    public Carrello getProdottiInCarr(@AuthenticationPrincipal HttpServletRequest user) {
-        Utente u = utenteService.getUtente(user);
+    @ResponseBody
+    public Carrello getProdottiInCarr() {
+        Utente u = utenteService.getUtente();
         Carrello carr= new Carrello(carrelloService.getProdottiCarrello(u.getEmail()));
         return carr;
     }
 
     @GetMapping("/empty")
     @ResponseBody
-    public ResponseEntity emptyCarrello(@AuthenticationPrincipal HttpServletRequest user){
-        carrelloService.emptyCart(user);
+    public ResponseEntity emptyCarrello(){
+        carrelloService.emptyCart();
         return new ResponseEntity(HttpStatus.OK);
     }
 
     @PostMapping("/remove")
     @ResponseBody
-    public ResponseEntity rimuoviProdotto(@AuthenticationPrincipal HttpServletRequest user, @RequestBody ProdottoInCarrello prodottoInCarrello){
-        carrelloService.rimuoviProdottoInCarrello(user, prodottoInCarrello);
+    public ResponseEntity rimuoviProdotto( @RequestBody ProdottoInCarrello prodottoInCarrello){
+        carrelloService.rimuoviProdottoInCarrello( prodottoInCarrello);
         return new ResponseEntity(prodottoInCarrello, HttpStatus.OK);
     }
 
     @GetMapping("/utente")
     @ResponseBody
-    public Utente getUtente(@AuthenticationPrincipal HttpServletRequest user){
-        return utenteService.getUtente(user);
+    public Utente getUtente(){
+        return utenteService.getUtente();
     }
 
     @GetMapping("/utentename")
     @ResponseBody
-    public String getUtenteName(@AuthenticationPrincipal  HttpServletRequest user){
-        Utente u=utenteService.getUtente(user);
+    public String getUtenteName(){
+        Utente u=utenteService.getUtente();
         return  u.getNome();
     }
 
     @GetMapping("/utenteemail")
     @ResponseBody
-    public String getUtenteEmail(@AuthenticationPrincipal  HttpServletRequest user){
-        Utente u=utenteService.getUtente(user);
+    public String getUtenteEmail(){
+        Utente u=utenteService.getUtente();
         System.out.println(u.getEmail());
         return  u.getNome();
     }
