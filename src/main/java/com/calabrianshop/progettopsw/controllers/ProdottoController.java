@@ -43,4 +43,8 @@ public class ProdottoController {
     public Prodotto getProdotto(@PathVariable("id") int id){
         return prodottoService.getProdotto(id);
     }
+
+    @PostMapping("/upprod")
+    public void  updateProd(Prodotto p){ this.prodottoService.updateProduct(p); }
 }
+

@@ -4,17 +4,12 @@ import com.calabrianshop.progettopsw.entities.*;
 import com.calabrianshop.progettopsw.reporsitories.OrdineProdottoRepository;
 import com.calabrianshop.progettopsw.reporsitories.OrdineRepository;
 import com.calabrianshop.progettopsw.reporsitories.ProdottoInCarrelloRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
@@ -52,25 +47,10 @@ public class CarrelloService {
         entityManager.flush();
     }
 
-    private JsonNode getTokenNode() {
-        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jwtAsString;
-        JsonNode jsonNode;
-        try {
-            jwtAsString = objectMapper.writeValueAsString(jwt);
-            jsonNode = objectMapper.readTree(jwtAsString);
-        } catch (JsonProcessingException e) {
-            e.getMessage();
-            throw new RuntimeException("Unable to retrieve user's info!");
-        }
-        return jsonNode;
-    }
-
     @Transactional(readOnly = false)
     public ProdottoInCarrello aggiungiProdotto( ProdottoInCarrello prodotto) {
-        System.out.println("user is " + getTokenNode().get("claims").get("email").asText());
         Utente u = utenteService.getUtente();
+        System.out.println("user is " + u.getEmail() );
         System.out.println("utente is " + u.getId() + u.getNome() + u.getEmail() + u.getCarrello());
         prodotto.setUtente(u);
         System.out.println("Il prodotto da aggiungere è :" +prodotto.getProdotto().getNome());
@@ -79,7 +59,7 @@ public class CarrelloService {
             if(p.equals(prodotto)) {
                 System.out.println("I prodotti sono uguali");
                 int newQuant = p.getQuantita() + prodotto.getQuantita();
-                //if(newQuant>p.getProdotto().getQuantita())throw new IllegalStateException("non disponibile!");
+                if(newQuant>p.getProdotto().getQuantita())throw new IllegalStateException("non disponibile!");
                 p.setQuantita(newQuant);
                 return p;
             }
@@ -87,6 +67,7 @@ public class CarrelloService {
         prodotto= prodottoInCarrelloRepository.save(prodotto);
         return prodotto;
     }
+
 
     @Transactional
     public List<ProdottoInCarrello> updateCarrello( List<ProdottoInCarrello> prodotti) {
@@ -101,7 +82,7 @@ public class CarrelloService {
     }
 
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
+    @Transactional(readOnly = false)
     public Ordine registraOrdine(String ind) {
         Utente u = utenteService.getUtente();
         if (u.getCarrello().isEmpty()) throw new IllegalStateException();
@@ -116,23 +97,25 @@ public class CarrelloService {
         newOrdine.setOrdineProdottoCol(new LinkedList<>());
         newOrdine = ordineRepository.save(newOrdine);
         entityManager.flush();
-        //  entityManager.lock(ProdottoInCarrello.class, LockModeType.OPTIMISTIC);
+        //GROWING
+        for(ProdottoInCarrello p : prodottoInCarrelloRepository.findByUtente(u)) entityManager.lock(p.getProdotto(), LockModeType.OPTIMISTIC);
         for (ProdottoInCarrello p : prodottoInCarrelloRepository.findByUtente(u)) {
             Prodotto prod = entityManager.find(Prodotto.class, p.getProdotto().getId());
-            //     entityManager.lock(Prodotto.class, LockModeType.OPTIMISTIC);
             OrdineProdotto op = new OrdineProdotto();
+            int qt = p.getQuantita();
+            if(prod.getQuantita() < qt)throw new IllegalStateException("quantità non disponibile!");
+            prod.setQuantita(prod.getQuantita()-p.getQuantita());
             op.setOrdine(newOrdine);
             op.setProdotto(prod);
             op.setQuantita(p.getQuantita());
             ordineProdottoRepository.save(op);
             newOrdine.setTotale(newOrdine.getTotale() + prod.getPrezzo() * p.getQuantita());
             //newOrdine.addProdotto(prod, p.getQuantita());
-            //prod.setQuantita(prod.getQuantita()-p.getQuantita());
-            //      entityManager.lock(Prodotto.class, LockModeType.NONE);
         }
         u.getCarrello().clear();
-        // entityManager.lock(ProdottoInCarrello.class, LockModeType.NONE);
         entityManager.flush();
+        //SHRINKING
+        for(ProdottoInCarrello p : prodottoInCarrelloRepository.findByUtente(u)) entityManager.lock(p.getProdotto(), LockModeType.NONE);
         return newOrdine;
     }
 

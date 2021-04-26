@@ -24,6 +24,7 @@ public class ProdottoService {
         return prodottoRepository.findById(id);
     }
 
+
     @Transactional(readOnly = true)
     public List<Prodotto> showAllProducts(){
         return prodottoRepository.findAll();
@@ -40,8 +41,11 @@ public class ProdottoService {
 
     @Transactional(readOnly = false)
     public void addProduct(Prodotto prodotto){
-        if(prodottoRepository.existsById(prodotto.getId()))
-            throw new IllegalArgumentException(("Prodotto già esistente!"));
+        List<Prodotto> prodotti= prodottoRepository.findAll();
+        for(Prodotto p : prodotti){
+            if(p.getNome().equals(prodotto.getNome()) && p.getVenditore().equals(prodotto.getVenditore()))
+                throw new IllegalArgumentException(("Prodotto già esistente!"));
+        }
         prodottoRepository.save(prodotto);
     }
 
@@ -50,9 +54,11 @@ public class ProdottoService {
         if(!prodottoRepository.existsById(id))
             throw  new IllegalArgumentException("prodotto inesistente!");
         Prodotto old=em.find(Prodotto.class, id);
+        em.lock(old,LockModeType.OPTIMISTIC);
         Integer quantita= old.getQuantita();
         old.setQuantita(quantita+1);
         em.flush();
+        em.lock(old,LockModeType.NONE);
     }
 
     @Transactional(readOnly = false)
@@ -60,6 +66,7 @@ public class ProdottoService {
         if(!prodottoRepository.existsById(prodotto.getId()))
             throw  new IllegalArgumentException("prodotto inesistente!");
         Prodotto old=em.find(Prodotto.class, prodotto.getId());
+        em.lock(old,LockModeType.OPTIMISTIC);
         Double prezzo=prodotto.getPrezzo();
         Integer quantita=prodotto.getQuantita();
         String nome=prodotto.getNome();
@@ -69,7 +76,9 @@ public class ProdottoService {
         if(quantita!=null) old.setQuantita(quantita);
         if(nome!=null) old.setNome(nome);
         if(venditore!=null)old.setVenditore(venditore);
+        if(categoria!=null)old.setCategoria(categoria);
         em.flush();
+        em.lock(old,LockModeType.NONE);
     }
 
     @Transactional(readOnly = true)
@@ -77,21 +86,6 @@ public class ProdottoService {
         Prodotto p= prodottoRepository.findById(id);
         if(p==null)return 0;
         return p.getQuantita();
-    }
-
-    @Transactional(readOnly = false)
-    public void buyProduct(int id, int quantita){
-        if(!prodottoRepository.existsById(id))
-            throw new IllegalArgumentException("prodotto inesistente!");
-        Prodotto p= em.find(Prodotto.class, id);
-        int inQuant= p.getQuantita();
-        if(inQuant<quantita)
-            throw new IllegalArgumentException("Quantita non disponibile!");
-        em.lock(p, LockModeType.OPTIMISTIC);
-        p.setQuantita(inQuant-quantita);
-        em.flush();
-        em.lock(p, LockModeType.NONE);
-
     }
 
 }

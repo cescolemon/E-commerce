@@ -17,6 +17,7 @@ public interface ProdottoRepository extends JpaRepository<Prodotto,Integer> {
 
     boolean existsById(int id);
     boolean existsByNome(String nome);
+    boolean existsByVenditore(String venditore);
     List<Prodotto> findByCategoria(String categoria);
     void deleteById (int id);
 }

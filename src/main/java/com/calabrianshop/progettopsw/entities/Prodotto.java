@@ -16,6 +16,9 @@ public class Prodotto {
     private String venditore;
     private String imagePath;
     private String descrizione;
+    private Collection<ProdottoInCarrello> prodottoInCarrello;
+    private Collection<OrdineProdotto> ordineProdottoCol;
+    private int version;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -83,6 +86,7 @@ public class Prodotto {
     public String getImagePath(){
         return imagePath;
     }
+
     public void setImagePath(String s){
         this.imagePath=s;
     }
@@ -96,7 +100,6 @@ public class Prodotto {
     public void setDescrizione(String descrizione) {
         this.descrizione = descrizione;
     }
-
 
     @Override
     public boolean equals(Object o) {
@@ -117,7 +120,6 @@ public class Prodotto {
         return Objects.hash(id, nome, categoria, quantita, prezzo, venditore);
     }
 
-    private Collection<ProdottoInCarrello> prodottoInCarrello;
     @JsonIgnore
     @OneToMany( mappedBy = "prodotto")
     public Collection<ProdottoInCarrello> getProdottoInCarrello() {
@@ -128,7 +130,6 @@ public class Prodotto {
         this.prodottoInCarrello = prodottoInCarrello;
     }
 
-    private Collection<OrdineProdotto> ordineProdottoCol;
     @JsonIgnore
     @OneToMany(mappedBy = "prodotto")
     public Collection<OrdineProdotto> getOrdineProdottoCol() {
@@ -137,5 +138,15 @@ public class Prodotto {
 
     public void setOrdineProdottoCol(Collection<OrdineProdotto> ordineProdottoCol) {
         this.ordineProdottoCol = ordineProdottoCol;
+    }
+
+    @Version
+    @Column(name = "version")
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
 }

@@ -1,6 +1,5 @@
 package com.calabrianshop.progettopsw.services;
 
-import com.calabrianshop.progettopsw.entities.Ordine;
 import com.calabrianshop.progettopsw.entities.ProdottoInCarrello;
 import com.calabrianshop.progettopsw.entities.Utente;
 import com.calabrianshop.progettopsw.reporsitories.UtenteRepository;
@@ -13,10 +12,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.persistence.EntityManager;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -62,7 +59,7 @@ public class UtenteService {
             throw new IllegalArgumentException("utente gia esistente!");
         return utenteRepository.save(u);
     }
-    @ResponseBody
+    @Transactional(readOnly = false)
     public  String getUserEmail(){
         String email = getTokenNode().get("claims").get("email").asText();
         System.out.println("email is"+ email);
@@ -99,7 +96,7 @@ public class UtenteService {
 
     @Transactional
     public Utente accounting(){
-        String email = getTokenNode().get("claims").get("email").asText();
+        String email = getUserEmail();
         Utente u=new Utente();
         u.setEmail(email);
         u.setNome(getTokenNode().get("claims").get("name").asText());
@@ -110,11 +107,5 @@ public class UtenteService {
         return u;
     }
 
-    @Transactional(readOnly = true)
-    public List<Ordine> showAllOrdini( ){
-        Utente u= accounting();
-        Collection<Ordine> ordines= u.getOrdini();
-        List<Ordine> ret= (List<Ordine>)u.getOrdini();
-        return ret;
-    }
+
 }
